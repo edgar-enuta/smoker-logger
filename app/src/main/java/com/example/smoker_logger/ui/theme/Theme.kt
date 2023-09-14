@@ -5,34 +5,22 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material.darkColors
 import androidx.compose.material.lightColors
 import androidx.compose.runtime.Composable
-
-private val DarkColorPalette = darkColors(
-        primary = Purple200,
-        primaryVariant = Purple700,
-        secondary = Teal200
-)
-
-private val LightColorPalette = lightColors(
-        primary = Purple500,
-        primaryVariant = Purple700,
-        secondary = Teal200
-
-        /* Other default colors to override
-    background = Color.White,
-    surface = Color.White,
-    onPrimary = Color.White,
-    onSecondary = Color.Black,
-    onBackground = Color.Black,
-    onSurface = Color.Black,
-    */
-)
+import androidx.compose.ui.res.colorResource
 
 @Composable
 fun SmokerloggerTheme(darkTheme: Boolean = isSystemInDarkTheme(), content: @Composable () -> Unit) {
     val colors = if (darkTheme) {
-        DarkColorPalette
+        darkColors(
+        primary = colorResource(Purple200),
+        primaryVariant = colorResource(Purple700),
+        secondary = colorResource(Teal200)
+        )
     } else {
-        LightColorPalette
+        lightColors(
+            primary = colorResource(Purple500),
+            primaryVariant = colorResource(Purple700),
+            secondary = colorResource(Teal200)
+        )
     }
 
     MaterialTheme(
