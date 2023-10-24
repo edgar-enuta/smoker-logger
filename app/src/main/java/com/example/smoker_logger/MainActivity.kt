@@ -15,11 +15,14 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.viewinterop.AndroidView
 import com.example.smoker_logger.ui.theme.SmokerloggerTheme
+import java.io.File
 import java.util.*
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        val dexOutputDir: File = codeCacheDir
+        dexOutputDir.setReadOnly()
         setContent {
             SmokerloggerTheme {
                 Log.d(MainActivity::class.toString(), "onCreate")
@@ -86,6 +89,9 @@ fun Calendar(modifier: Modifier = Modifier) {
         modifier,
         update = { views ->
             views.date = calendar.timeInMillis
+            views.setOnDateChangeListener { calendarView, year, month, day ->
+                Log.d("onDateChangeListener", "changed date")
+            }
         }
     )
 }
