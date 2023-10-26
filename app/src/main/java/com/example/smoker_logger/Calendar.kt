@@ -3,9 +3,15 @@ package com.example.smoker_logger
 import android.util.Log
 import android.view.ContextThemeWrapper
 import android.widget.CalendarView
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
-import androidx.compose.material.Text
-import androidx.compose.runtime.Composable
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.material.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.ArrowForward
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.viewinterop.AndroidView
@@ -15,7 +21,7 @@ fun Calendar() {
     Column {
         DateHeader()
         DatePicker()
-        MonthCalendar()
+//        MonthCalendar()
     }
 }
 
@@ -26,7 +32,38 @@ fun MonthCalendar() {
 
 @Composable
 fun DatePicker() {
-    TODO("Not yet implemented")
+    Row() {
+        DatesDropdown()
+        IconButton(onClick = { /*TODO*/ }) {
+            Icon(imageVector = Icons.Filled.ArrowBack, contentDescription = "Previous")
+        }
+        IconButton(onClick = { /*TODO*/ }) {
+            Icon(imageVector = Icons.Filled.ArrowForward, contentDescription = "Next")
+        }
+    }
+}
+
+@Composable
+fun DatesDropdown() {
+    var expanded by remember { mutableStateOf(false) }
+    val items = listOf("jan", "feb", "march")
+    var selectedIndex by remember { mutableStateOf(0) }
+    Text(text = items[selectedIndex], modifier = Modifier
+        .fillMaxWidth(.5f)
+        .clickable(onClick = { expanded = true }))
+    DropdownMenu(
+        expanded = expanded,
+        onDismissRequest = { expanded = false },
+        modifier = Modifier.fillMaxWidth(.5f)) {
+        items.forEachIndexed { index, item ->
+            DropdownMenuItem(onClick = {
+                selectedIndex = index
+                expanded = false
+            }) {
+                Text(text = item)
+            }
+        }
+    }
 }
 
 @Composable
