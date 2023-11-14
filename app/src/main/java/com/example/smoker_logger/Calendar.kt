@@ -19,6 +19,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
+import java.text.DateFormatSymbols
+import java.text.SimpleDateFormat
+import java.time.YearMonth
+import java.util.*
 
 @Composable
 fun Calendar() {
@@ -31,14 +35,19 @@ fun Calendar() {
 
 @Composable
 fun MonthCalendar() {
-    LazyVerticalGrid(columns = GridCells.Fixed(7), content = {items(30) { CalendarItem() } })
+    val calendar = Calendar.getInstance()
+    val monthLength = YearMonth.of(calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH)).lengthOfMonth()
+    val dates = 1..monthLength
+
+    LazyVerticalGrid(columns = GridCells.Fixed(7), content = {items(dates.count()) { index ->
+        CalendarItem(dates.elementAt(index))
+        }
+    })
 }
 
 @Composable
-fun CalendarItem() {
-    var date by remember { mutableStateOf(1) }
+fun CalendarItem(date: Int) {
     Text(text = date.toString(), modifier = Modifier.padding(5.dp))
-    date += 1
 }
 
 @Composable
@@ -57,8 +66,9 @@ fun DatePicker() {
 @Composable
 fun DatesDropdown() {
     var expanded by remember { mutableStateOf(false) }
-    val items = listOf("jan", "feb", "march")
+    val items = DateFormatSymbols().months
     var selectedIndex by remember { mutableStateOf(0) }
+
     Text(text = items[selectedIndex], modifier = Modifier
         .fillMaxWidth(.5f)
         .clickable(onClick = { expanded = true }))
@@ -79,13 +89,15 @@ fun DatesDropdown() {
 
 @Composable
 fun DateHeader() {
-    Text(text = "Mon, Aug 17")
+    val date = Calendar.getInstance().time
+    val formattedDate = SimpleDateFormat("EEE, MMM d").format(date)
+    Text(text = formattedDate)
 }
 
 @Composable
 fun CalendarAndroidView(modifier: Modifier = Modifier) {
     val context = LocalContext.current
-    val calendar = java.util.Calendar.getInstance()
+    val calendar = Calendar.getInstance()
 
 //    var selectedDateText by remember { mutableStateOf("") }
 //    val year = calendar[Calendar.YEAR]
