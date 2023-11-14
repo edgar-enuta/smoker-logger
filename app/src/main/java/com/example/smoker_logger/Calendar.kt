@@ -7,6 +7,9 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
@@ -14,6 +17,7 @@ import androidx.compose.material.icons.filled.ArrowForward
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 
 @Composable
@@ -21,13 +25,20 @@ fun Calendar() {
     Column {
         DateHeader()
         DatePicker()
-//        MonthCalendar()
+        MonthCalendar()
     }
 }
 
 @Composable
 fun MonthCalendar() {
-    TODO("Not yet implemented")
+    LazyVerticalGrid(columns = GridCells.Fixed(7), content = {items(30) { CalendarItem() } })
+}
+
+@Composable
+fun CalendarItem() {
+    var date by remember { mutableStateOf(1) }
+    Text(text = date.toString(), modifier = Modifier.padding(5.dp))
+    date += 1
 }
 
 @Composable
