@@ -8,8 +8,8 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.grid.GridCells
-import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
@@ -35,14 +35,39 @@ fun Calendar() {
 
 @Composable
 fun MonthCalendar() {
-    val calendar = Calendar.getInstance()
-    val monthLength = YearMonth.of(calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH)).lengthOfMonth()
-    val dates = 1..monthLength
+    val listState = rememberLazyListState()
 
-    LazyVerticalGrid(columns = GridCells.Fixed(7), content = {items(dates.count()) { index ->
-        CalendarItem(dates.elementAt(index))
+    val months = 1..12
+
+    LazyColumn(state = listState) {
+        items(months.count()) { index ->
+            val monthLength = getMonthLength(Calendar.YEAR, months.elementAt(index))
+            val dates = 1..monthLength
+
+            Text(text = DateFormatSymbols().months.get(index))
+            MonthDates(dates = dates, columns = 7)
         }
-    })
+    }
+}
+
+fun getMonthLength(year: Int, month: Int): Int {
+    return YearMonth.of(year, month).lengthOfMonth()
+}
+
+@Composable
+fun MonthDates(dates: IntRange, columns: Int) {
+    Column() {
+        for (row in 0 until dates.count() / columns + 1)
+            Row() {
+                for (index in row * columns until (row + 1) * columns)
+                    if(index < dates.count())
+                        CalendarItem(date = dates.elementAt(index))
+            }
+    }
+}
+
+fun loadMoreMonths() {
+    TODO("Not yet implemented")
 }
 
 @Composable
