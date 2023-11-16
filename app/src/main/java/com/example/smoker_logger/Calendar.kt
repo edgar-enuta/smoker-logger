@@ -1,5 +1,6 @@
 package com.example.smoker_logger
 
+import android.annotation.SuppressLint
 import android.util.Log
 import android.view.ContextThemeWrapper
 import android.widget.CalendarView
@@ -8,8 +9,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
@@ -26,36 +25,66 @@ import java.util.*
 
 @Composable
 fun Calendar() {
+    val year = remember { mutableStateOf(Calendar.getInstance().get(Calendar.YEAR)) }
+    val month = remember { mutableStateOf(Calendar.getInstance().get(Calendar.MONTH)) }
+
     Column {
+        Text(text = "${year.value} ${month.value}")
         DateHeader()
-        DatePicker()
-        MonthCalendar()
+        DatePicker(year, month)
+        MonthsList(year, month)
     }
 }
 
 @Composable
-fun MonthCalendar() {
-    val listState = rememberLazyListState()
-
-    val months = 1..12
-
-    LazyColumn(state = listState) {
-        items(months.count()) { index ->
-            val monthLength = getMonthLength(Calendar.YEAR, months.elementAt(index))
-            val dates = 1..monthLength
-
-            Text(text = DateFormatSymbols().months.get(index))
-            MonthDates(dates = dates, columns = 7)
+fun DatePicker(year: MutableState<Int>, month: MutableState<Int>) {
+    Row() {
+        DatesDropdown(month)
+        IconButton(onClick = {
+            minusMonth(year, month)
+        }) {
+            Icon(imageVector = Icons.Filled.ArrowBack, contentDescription = "Previous")
+        }
+        IconButton(onClick = {
+            plusMonth(year, month)
+        }) {
+            Icon(imageVector = Icons.Filled.ArrowForward, contentDescription = "Next")
         }
     }
 }
 
-fun getMonthLength(year: Int, month: Int): Int {
-    return YearMonth.of(year, month).lengthOfMonth()
+fun minusMonth(year: MutableState<Int>, month: MutableState<Int>) {
+    if(month.value <= 1) {
+        year.value--
+        month.value = 12
+    }
+    else {
+        month.value--
+    }
+}
+
+fun plusMonth(year: MutableState<Int>, month: MutableState<Int>) {
+    if(month.value >= 12) {
+        year.value++
+        month.value = 1
+    }
+    else {
+        month.value++
+    }
+}
+
+@SuppressLint("NewApi")
+@Composable
+fun MonthsList(year: MutableState<Int>, month: MutableState<Int>) {
+    val monthLength = YearMonth.of(year.value, month.value).lengthOfMonth()
+    val data = 1..monthLength
+//    val data by remember { mutableStateOf(1..monthLength) }
+
+    MonthDates(dates = data , columns = 7)
 }
 
 @Composable
-fun MonthDates(dates: IntRange, columns: Int) {
+fun MonthDates(dates: IntRange, columns: Int = 7) {
     Column() {
         for (row in 0 until dates.count() / columns + 1)
             Row() {
@@ -66,35 +95,18 @@ fun MonthDates(dates: IntRange, columns: Int) {
     }
 }
 
-fun loadMoreMonths() {
-    TODO("Not yet implemented")
-}
-
 @Composable
 fun CalendarItem(date: Int) {
     Text(text = date.toString(), modifier = Modifier.padding(5.dp))
 }
 
 @Composable
-fun DatePicker() {
-    Row() {
-        DatesDropdown()
-        IconButton(onClick = { /*TODO*/ }) {
-            Icon(imageVector = Icons.Filled.ArrowBack, contentDescription = "Previous")
-        }
-        IconButton(onClick = { /*TODO*/ }) {
-            Icon(imageVector = Icons.Filled.ArrowForward, contentDescription = "Next")
-        }
-    }
-}
-
-@Composable
-fun DatesDropdown() {
+fun DatesDropdown(month: MutableState<Int>) {
     var expanded by remember { mutableStateOf(false) }
     val items = DateFormatSymbols().months
-    var selectedIndex by remember { mutableStateOf(0) }
+//    var selectedIndex by remember { mutableStateOf(month.value - 1) }
 
-    Text(text = items[selectedIndex], modifier = Modifier
+    Text(text = items[month.value - 1], modifier = Modifier
         .fillMaxWidth(.5f)
         .clickable(onClick = { expanded = true }))
     DropdownMenu(
@@ -103,8 +115,8 @@ fun DatesDropdown() {
         modifier = Modifier.fillMaxWidth(.5f)) {
         items.forEachIndexed { index, item ->
             DropdownMenuItem(onClick = {
-                selectedIndex = index
                 expanded = false
+                month.value = index + 1
             }) {
                 Text(text = item)
             }
